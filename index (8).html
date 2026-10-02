@@ -1,0 +1,883 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Grade Calculator</title>
+
+<style>
+:root {
+  --pink: #ed4f9b;
+  --pink-light: #fff0f7;
+  --navy: #182238;
+  --text: #263650;
+  --muted: #748198;
+  --border: #e5e9f2;
+  --white: #ffffff;
+  --green: #16875b;
+  --red: #d93852;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f6f7fc;
+  color: var(--text);
+}
+
+button, input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid #f8a8d0;
+  outline-offset: 2px;
+}
+
+.hero {
+  background: var(--navy);
+  color: white;
+  padding: 28px 18px;
+  text-align: center;
+  border-bottom: 5px solid var(--pink);
+}
+
+.hero .icon {
+  font-size: 34px;
+}
+
+.hero h1 {
+  margin: 10px 0;
+  font-size: clamp(25px, 5vw, 38px);
+}
+
+.hero h1 span {
+  color: #ff82bd;
+}
+
+.hero p {
+  margin: 0;
+  color: #d9e2f3;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  padding: 22px 14px;
+  margin: auto;
+}
+
+.student-card,
+.panel,
+.result-card,
+.guide-card,
+.actions {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 5px 20px rgba(29, 42, 72, 0.04);
+}
+
+.student-card label,
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.student-card input,
+.field input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #d8deeb;
+  background: #fff;
+  color: var(--text);
+  padding: 13px;
+  border-radius: 10px;
+}
+
+input::placeholder {
+  color: #9aa5b7;
+}
+
+.student-card input:focus,
+.field input:focus {
+  border-color: var(--pink);
+  outline: 2px solid #ffe1ef;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(270px, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+h2 {
+  font-size: 21px;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr 0.8fr;
+  gap: 12px;
+}
+
+.primary,
+.secondary,
+.danger {
+  border: 0;
+  border-radius: 10px;
+  padding: 13px 16px;
+  font-weight: bold;
+}
+
+.primary {
+  color: white;
+  background: linear-gradient(135deg, #f04f9d, #d83d89);
+}
+
+.primary:hover {
+  filter: brightness(1.06);
+}
+
+.secondary {
+  background: var(--pink-light);
+  color: #bd337d;
+  border: 1px solid #f7c4df;
+}
+
+.danger {
+  background: #fff0f1;
+  color: var(--red);
+}
+
+.add-btn {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.message {
+  display: none;
+  margin-top: 12px;
+  padding: 11px 13px;
+  border-radius: 9px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.message.show {
+  display: block;
+}
+
+.message.error {
+  background: #fff0f1;
+  color: #b4233e;
+}
+
+.message.success {
+  background: #eafaf2;
+  color: #13764d;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 22px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 520px;
+  font-size: 13px;
+}
+
+th {
+  background: var(--pink-light);
+  color: #80315b;
+  text-align: left;
+  padding: 13px 10px;
+}
+
+td {
+  border-bottom: 1px solid var(--border);
+  padding: 13px 10px;
+}
+
+td.number,
+th.number {
+  text-align: center;
+}
+
+tbody tr:hover {
+  background: #fffafd;
+}
+
+.delete-btn {
+  border: none;
+  background: #fff0f6;
+  color: #d93f8c;
+  border-radius: 7px;
+  padding: 7px 10px;
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 28px 10px;
+  line-height: 1.6;
+}
+
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: #fff4fa;
+  padding: 14px;
+  border-radius: 10px;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.result-card {
+  background: var(--navy);
+  color: white;
+  text-align: center;
+  border: 0;
+  padding: 22px 18px;
+}
+
+.result-card h2 {
+  text-align: left;
+  margin-bottom: 22px;
+}
+
+.ring {
+  width: 155px;
+  height: 155px;
+  border-radius: 50%;
+  margin: 0 auto 18px;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(
+    var(--pink) 0deg,
+    var(--pink) 0deg,
+    #39435a 0deg
+  );
+  position: relative;
+}
+
+.ring::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  background: var(--navy);
+}
+
+.ring-content {
+  position: relative;
+  z-index: 1;
+}
+
+.grade-value {
+  font-size: 34px;
+  font-weight: bold;
+  letter-spacing: -1px;
+}
+
+.grade-label {
+  color: #d5deef;
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.status {
+  display: inline-block;
+  border-radius: 30px;
+  padding: 10px 26px;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  background: #3e4960;
+  color: #f4f6fb;
+}
+
+.status.pass {
+  background: #175e4a;
+  color: #a6f2ce;
+}
+
+.status.fail {
+  background: #712c3c;
+  color: #ffc0cb;
+}
+
+.stats {
+  border: 1px solid #46536c;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: left;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+.stat-row span {
+  color: #d3dced;
+}
+
+.stat-row strong {
+  text-align: right;
+}
+
+.guide-card {
+  background: #fff5fb;
+  border-color: #f7d9ea;
+}
+
+.guide-card h2 {
+  color: #a62f72;
+  font-size: 18px;
+}
+
+.guide-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid #f0dce8;
+  font-size: 13px;
+}
+
+.guide-row:last-child {
+  border-bottom: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.actions button {
+  flex: 1;
+  min-width: 130px;
+}
+
+.actions .reset {
+  background: white;
+  color: #5e687a;
+  border: 1px solid #cfd5e1;
+}
+
+.note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+  padding: 0 8px 20px;
+}
+
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .result-card {
+    order: -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 13px 10px;
+  }
+
+  .panel,
+  .student-card,
+  .result-card,
+  .guide-card {
+    padding: 15px;
+    border-radius: 13px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .field:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .grade-value {
+    font-size: 30px;
+  }
+
+  .actions {
+    padding: 13px;
+  }
+
+  .actions button {
+    flex-basis: 100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="hero">
+  <div class="icon">🎓</div>
+  <h1>Student <span>Grade Calculator</span></h1>
+  <p>Enter your grades, calculate your average, and track your progress.</p>
+</header>
+
+<main class="container">
+
+  <section class="student-card">
+    <label for="studentName">Student Name (optional)</label>
+    <input id="studentName" type="text"
+      placeholder="Enter student name" maxlength="100">
+  </section>
+
+  <div class="layout">
+
+    <section class="panel">
+      <h2>📝 Add Subjects</h2>
+      <p class="subtitle">
+        Enter each subject's grade and its percentage weight.
+        All weights must add up to 100%.
+      </p>
+
+      <form id="subjectForm">
+        <div class="form-grid">
+
+          <div class="field">
+            <label for="subjectName">Subject Name</label>
+            <input id="subjectName" type="text"
+              placeholder="e.g. Mathematics" maxlength="80" required>
+          </div>
+
+          <div class="field">
+            <label for="grade">Grade (0–100)</label>
+            <input id="grade" type="number"
+              placeholder="e.g. 90" min="0" max="100"
+              step="0.01" required>
+          </div>
+
+          <div class="field">
+            <label for="weight">Weight (%)</label>
+            <input id="weight" type="number"
+              placeholder="e.g. 20" min="0.01" max="100"
+              step="0.01" required>
+          </div>
+
+        </div>
+
+        <button class="primary add-btn" type="submit">
+          ＋ Add Subject
+        </button>
+
+        <div id="formMessage" class="message"
+          role="status" aria-live="polite"></div>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th class="number">Grade</th>
+              <th class="number">Weight</th>
+              <th class="number">Weighted Score</th>
+              <th class="number">Action</th>
+            </tr>
+          </thead>
+          <tbody id="subjectList"></tbody>
+        </table>
+      </div>
+
+      <div id="emptyMessage" class="empty">
+        📚 No subjects yet.<br>
+        Add your first subject using the form above.
+      </div>
+
+      <div class="table-footer">
+        <span>Total Subjects: <strong id="subjectCount">0</strong></span>
+        <span>Total Weight: <strong id="totalWeight">0.00%</strong></span>
+      </div>
+    </section>
+
+    <aside>
+      <section class="result-card">
+        <h2>📊 Final Result</h2>
+
+        <div class="ring" id="gradeRing">
+          <div class="ring-content">
+            <div class="grade-value" id="finalGrade">—</div>
+            <div class="grade-label">Weighted Average</div>
+          </div>
+        </div>
+
+        <div id="gradeStatus" class="status">
+          NOT CALCULATED
+        </div>
+
+        <div class="stats">
+          <div class="stat-row">
+            <span>Weighted Score</span>
+            <strong id="weightedScore">—</strong>
+          </div>
+          <div class="stat-row">
+            <span>Total Weight</span>
+            <strong id="resultWeight">0.00%</strong>
+          </div>
+          <div class="stat-row">
+            <span>Subjects Added</span>
+            <strong id="resultCount">0</strong>
+          </div>
+          <div class="stat-row">
+            <span>Passing Grade</span>
+            <strong>75.00</strong>
+          </div>
+        </div>
+
+        <p id="resultNote" class="subtitle"
+          style="color:#d5deef;margin:16px 0 0">
+          Add your subjects and calculate your grade.
+        </p>
+      </section>
+
+      <section class="guide-card">
+        <h2>💡 Grade Guide</h2>
+
+        <div class="guide-row">
+          <strong>90–100</strong><span>Excellent</span>
+        </div>
+        <div class="guide-row">
+          <strong>85–89.99</strong><span>Very Satisfactory</span>
+        </div>
+        <div class="guide-row">
+          <strong>80–84.99</strong><span>Satisfactory</span>
+        </div>
+        <div class="guide-row">
+          <strong>75–79.99</strong><span>Fairly Satisfactory</span>
+        </div>
+        <div class="guide-row">
+          <strong>Below 75</strong><span>Did Not Meet Expectations</span>
+        </div>
+
+        <p class="subtitle" style="margin:14px 0 0;font-size:12px">
+          This guide uses a 75 passing threshold. Your school may use a
+          different grading scale.
+        </p>
+      </section>
+    </aside>
+
+  </div>
+
+  <section class="actions">
+    <button id="calculateBtn" class="primary" type="button">
+      🧮 Calculate Grade
+    </button>
+
+    <button id="sampleBtn" class="secondary" type="button">
+      ✨ Try Sample Grades
+    </button>
+
+    <button id="resetBtn" class="reset secondary" type="button">
+      ↻ Reset All
+    </button>
+  </section>
+
+  <p class="note">
+    Student Grade Calculator · Simple, fast, and easy to use.<br>
+    Results are calculated in your browser and are not saved to a database.
+  </p>
+
+</main>
+
+<script>
+"use strict";
+
+const PASSING_GRADE = 75;
+const WEIGHT_TOLERANCE = 0.01;
+
+let subjects = [];
+let nextId = 1;
+
+const $ = id => document.getElementById(id);
+
+const subjectForm = $("subjectForm");
+const subjectName = $("subjectName");
+const gradeInput = $("grade");
+const weightInput = $("weight");
+const subjectList = $("subjectList");
+const emptyMessage = $("emptyMessage");
+const formMessage = $("formMessage");
+
+function showMessage(message, type = "error") {
+  formMessage.textContent = message;
+  formMessage.className = "message show " + type;
+}
+
+function clearMessage() {
+  formMessage.textContent = "";
+  formMessage.className = "message";
+}
+
+function getTotalWeight() {
+  return subjects.reduce((sum, subject) => sum + subject.weight, 0);
+}
+
+function getWeightedScore() {
+  return subjects.reduce(
+    (sum, subject) => sum + subject.grade * subject.weight / 100,
+    0
+  );
+}
+
+function renderSubjects() {
+  subjectList.replaceChildren();
+
+  subjects.forEach(subject => {
+    const row = document.createElement("tr");
+
+    const nameCell = document.createElement("td");
+    nameCell.textContent = subject.name;
+
+    const gradeCell = document.createElement("td");
+    gradeCell.className = "number";
+    gradeCell.textContent = subject.grade.toFixed(2);
+
+    const weightCell = document.createElement("td");
+    weightCell.className = "number";
+    weightCell.textContent = subject.weight.toFixed(2) + "%";
+
+    const scoreCell = document.createElement("td");
+    scoreCell.className = "number";
+    scoreCell.textContent =
+      (subject.grade * subject.weight / 100).toFixed(2);
+
+    const actionCell = document.createElement("td");
+    actionCell.className = "number";
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "delete-btn";
+    deleteButton.textContent = "Delete";
+    deleteButton.setAttribute(
+      "aria-label", "Delete " + subject.name
+    );
+
+    deleteButton.addEventListener("click", () => {
+      subjects = subjects.filter(item => item.id !== subject.id);
+      clearMessage();
+      renderSubjects();
+      resetResult();
+    });
+
+    actionCell.appendChild(deleteButton);
+
+    row.append(
+      nameCell, gradeCell, weightCell, scoreCell, actionCell
+    );
+
+    subjectList.appendChild(row);
+  });
+
+  const totalWeight = getTotalWeight();
+
+  $("subjectCount").textContent = subjects.length;
+  $("totalWeight").textContent = totalWeight.toFixed(2) + "%";
+  $("resultWeight").textContent = totalWeight.toFixed(2) + "%";
+  $("resultCount").textContent = subjects.length;
+
+  emptyMessage.style.display =
+    subjects.length === 0 ? "block" : "none";
+}
+
+function resetResult() {
+  $("finalGrade").textContent = "—";
+  $("weightedScore").textContent = "—";
+  $("gradeStatus").textContent = "NOT CALCULATED";
+  $("gradeStatus").className = "status";
+  $("resultNote").textContent =
+    "Add your subjects and calculate your grade.";
+
+  $("gradeRing").style.background =
+    "conic-gradient(#39435a 0deg 360deg)";
+}
+
+function calculateGrade() {
+  clearMessage();
+
+  if (subjects.length === 0) {
+    resetResult();
+    showMessage("Please add at least one subject first.");
+    subjectName.focus();
+    return;
+  }
+
+  const totalWeight = getTotalWeight();
+
+  if (Math.abs(totalWeight - 100) > WEIGHT_TOLERANCE) {
+    resetResult();
+    showMessage(
+      "Your total weight is " + totalWeight.toFixed(2) +
+      "%. Adjust your subject weights so they add up to 100%."
+    );
+    return;
+  }
+
+  const result = getWeightedScore();
+  const roundedResult = Math.round((result + Number.EPSILON) * 100) / 100;
+  const passed = roundedResult >= PASSING_GRADE;
+
+  $("finalGrade").textContent = roundedResult.toFixed(2);
+  $("weightedScore").textContent = roundedResult.toFixed(2);
+  $("gradeStatus").textContent = passed ? "PASSED ✓" : "NOT PASSED";
+  $("gradeStatus").className = "status " + (passed ? "pass" : "fail");
+
+  const degrees = Math.max(0, Math.min(100, roundedResult)) * 3.6;
+
+  $("gradeRing").style.background =
+    "conic-gradient(var(--pink) 0deg " + degrees +
+    "deg, #39435a " + degrees + "deg 360deg)";
+
+  $("resultNote").textContent =
+    "Your weighted average is " + roundedResult.toFixed(2) +
+    ". " + (passed
+      ? "You met the passing threshold of 75."
+      : "You need a weighted average of at least 75 to pass.");
+
+  showMessage("Your grade has been calculated successfully.", "success");
+}
+
+subjectForm.addEventListener("submit", event => {
+  event.preventDefault();
+  clearMessage();
+
+  const name = subjectName.value.trim();
+  const grade = Number(gradeInput.value);
+  const weight = Number(weightInput.value);
+
+  if (!name) {
+    showMessage("Please enter a subject name.");
+    subjectName.focus();
+    return;
+  }
+
+  if (
+    gradeInput.value.trim() === "" ||
+    !Number.isFinite(grade) ||
+    grade < 0 || grade > 100
+  ) {
+    showMessage("Enter a valid grade from 0 to 100.");
+    gradeInput.focus();
+    return;
+  }
+
+  if (
+    weightInput.value.trim() === "" ||
+    !Number.isFinite(weight) ||
+    weight <= 0 || weight > 100
+  ) {
+    showMessage("Enter a weight greater than 0 and at most 100.");
+    weightInput.focus();
+    return;
+  }
+
+  if (subjects.some(
+    subject => subject.name.toLowerCase() === name.toLowerCase()
+  )) {
+    showMessage("That subject is already in your list.");
+    subjectName.focus();
+    return;
+  }
+
+  if (getTotalWeight() + weight > 100 + WEIGHT_TOLERANCE) {
+    showMessage(
+      "Adding this weight would exceed 100%. " +
+      "You have " + (100 - getTotalWeight()).toFixed(2) +
+      "% remaining."
+    );
+    weightInput.focus();
+    return;
+  }
+
+  subjects.push({
+    id: nextId++,
+    name,
+    grade,
+    weight
+  });
+
+  subjectForm.reset();
+  renderSubjects();
+  resetResult();
+  showMessage("Subject added successfully!", "success");
+  subjectName.focus();
+});
+
+$("calculateBtn").addEventListener("click", calculateGrade);
+
+$("sampleBtn").addEventListener("click", () => {
+  subjects = [
+    { id: nextId++, name: "Filipino", grade: 90, weight: 20 },
+    { id: nextId++, name: "English", grade: 88, weight: 20 },
+    { id: nextId++, name: "Mathematics", grade: 85, weight: 20 },
+    { id: nextId++, name: "Science", grade: 92, weight: 20 },
+    { id: nextId++, name: "TLE", grade: 95, weight: 10 },
+    { id: nextId++, name: "MAPEH", grade: 93, weight: 10 }
+  ];
+
+  renderSubjects();
+  calculateGrade();
+});
+
+$("resetBtn").addEventListener("click", () => {
+  subjects = [];
+  nextId = 1;
+  subjectForm.reset();
+  $("studentName").value = "";
+  clearMessage();
+  renderSubjects();
+  resetResult();
+});
+
+renderSubjects();
+resetResult();
+</script>
+
+</body>
+</html>
